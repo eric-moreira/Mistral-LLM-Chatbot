@@ -1,0 +1,42 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#response-text {
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+.markdown-body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6,
+.markdown-body p,
+.markdown-body li,
+.markdown-body blockquote {
+  color: #000000 !important;
+}
+
+.markdown-body a {
+  color: #0056b3 !important;
+  text-decoration: underline;
+}
+
+.markdown-body pre,
+.markdown-body code {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  border-radius: 6px;
+  padding: 0.5em;
+  overflow-x: auto;
+}
+
+#response-text {
+  border: none;
+}
