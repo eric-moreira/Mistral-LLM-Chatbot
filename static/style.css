@@ -1,14 +1,86 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1a1a2e;
 }
 
-#response-text {
-  white-space: pre-wrap;
-  font-family: monospace;
+:root {
+  --bs-primary: #6a05ad;
+  --bs-secondary: #2c073e;
+  --bs-light: #e0b0ff;
+  --bs-dark: #1a1a2e;
+  --bs-info: #7209b7;
+  --bs-success: #4CAF50;
+  --bs-danger: #f44336;
+  --bs-warning: #ff9800;
 }
+
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #8c00b8 !important;
+  border-color: #8c00b8 !important;
+}
+
+.bg-primary { background-color: var(--bs-primary) !important; }
+.text-primary { color: var(--bs-primary) !important; }
+.bg-secondary { background-color: var(--bs-secondary) !important; }
+.text-secondary { color: var(--bs-secondary) !important; }
+.bg-light { background-color: var(--bs-light) !important; }
+.text-light { color: var(--bs-light) !important; }
+.bg-dark { background-color: var(--bs-dark) !important; }
+.text-dark { color: #000000 !important; }
+
+#chat-history {
+  border-radius: 1rem;
+  border: 1px solid var(--bs-light);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3) !important;
+}
+
+.card {
+  border-radius: 1rem;
+  border: none;
+}
+
+.form-control {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--bs-light);
+  border: 1px solid var(--bs-light);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-control:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(106, 5, 173, 0.25);
+  color: white;
+}
+
+.text-end .rounded-4 {
+  background-color: var(--bs-primary) !important;
+  color: white !important;
+  border-bottom-right-radius: 0.5rem !important;
+}
+
+.text-start .rounded-4 {
+  background-color: var(--bs-light) !important;
+  color: var(--bs-dark) !important;
+  border-bottom-left-radius: 0.5rem !important;
+}
+
 .markdown-body {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+  background-color: transparent !important;
+  color: var(--bs-dark) !important;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .markdown-body h1,
@@ -20,23 +92,20 @@ body {
 .markdown-body p,
 .markdown-body li,
 .markdown-body blockquote {
-  color: #000000 !important;
+  color: var(--bs-dark) !important;
 }
 
 .markdown-body a {
-  color: #0056b3 !important;
+  color: var(--bs-primary) !important;
   text-decoration: underline;
 }
 
 .markdown-body pre,
 .markdown-body code {
-  background-color: #1e1e1e !important;
-  color: #ffffff !important;
-  border-radius: 6px;
-  padding: 0.5em;
+  background-color: #333333 !important;
+  color: #f8f8f2 !important;
+  border-radius: 0.5rem;
+  padding: 0.75em;
   overflow-x: auto;
-}
-
-#response-text {
-  border: none;
+  font-size: 0.9em;
 }
