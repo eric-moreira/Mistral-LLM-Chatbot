@@ -3,6 +3,9 @@
 This project is a simple chatbot using the Mistral model running locally via Ollama.  
 The web interface is built with Flask and Bootstrap, with Markdown support in responses.
 
+![image](https://github.com/user-attachments/assets/26ab9033-c2e7-4c86-a9ed-9739554bd1c5)
+
+
 ---
 
 ## Requirements
