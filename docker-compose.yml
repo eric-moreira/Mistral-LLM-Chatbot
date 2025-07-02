@@ -1,0 +1,52 @@
+services:
+  # Serviço para a sua aplicação Flask (chatbot)
+  chatbot-app: # Renomeado para seguir o padrão de naming
+    build: .
+    ports:
+      - "5001:5000" # Porta 5001 do host para a 5000 do container
+    environment: # Sintaxe correta: mapeamento (chave: valor)
+      FLASK_APP: smol.py
+      # MONGO_URI agora usa o nome do serviço 'mongo' e lê a senha do secret
+      MONGO_URI: "mongodb://chatbot_user:$(cat /run/secrets/mongo_app_pass)@mongo:27017/chatbot_db"
+    depends_on:
+      - mongo # Garante que o serviço 'mongo' seja iniciado antes de 'chatbot-app'
+    networks:
+      - chatbot_internal_network
+    secrets: # Seção para declarar quais secrets este serviço tem acesso
+      - mongo_app_pass
+
+  # Serviço para o banco de dados MongoDB
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017" # Opcional: Mapeia a porta 27017 do host para acesso externo
+    environment: # Sintaxe correta: mapeamento (chave: valor)
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD_FILE: "/run/secrets/mongo_pass" # MongoDB lê a senha root deste arquivo secret
+      # Esta variável de ambiente será lida pelo seu script init-mongo.sh
+      MONGO_APP_PASSWORD: "$(cat /run/secrets/mongo_app_pass)" # Injeta a senha da aplicação como ENV var para o script
+    volumes:
+      - mongo_data:/data/db # Volume para persistir os dados do MongoDB
+      - ./mongo-init-scripts:/docker-entrypoint-initdb.d # Monta seus scripts de inicialização do DB
+      # REMOVIDAS as montagens diretas de secrets, pois elas são gerenciadas pela seção 'secrets:'
+      # - .secrets/mongo_pass:/run/secrets/mongo_pass:ro <-- REMOVER
+      # - .secrets/mongo_app_pass:/run/secrets/mongo_app_pass:ro <-- REMOVER
+    networks:
+      - chatbot_internal_network
+    secrets: # Seção para declarar quais secrets este serviço tem acesso
+      - mongo_pass # Acesso ao secret da senha root
+      - mongo_app_pass # Acesso ao secret da senha da aplicação
+
+networks:
+  chatbot_internal_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+
+# Definição GLOBAL dos secrets
+secrets:
+  mongo_pass:
+    file: ./.secrets/mongo_pass # Caminho para o arquivo que contém a senha root
+  mongo_app_pass:
+    file: ./.secrets/mongo_app_pass # Caminho para o arquivo que contém a senha da aplicação
