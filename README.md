@@ -5,13 +5,12 @@ The web interface is built with Flask and Bootstrap, with Markdown support in re
 
 ![image](https://github.com/user-attachments/assets/26ab9033-c2e7-4c86-a9ed-9739554bd1c5)
 
-
 ---
 
 ## Requirements
 
-- Python 3.10 or higher  
-- Ollama installed locally
+- Docker (for running all required services and images)
+- Ollama installed locally (for local LLM inference)
 
 ---
 
@@ -49,22 +48,32 @@ pip install -r requirements.txt
 ### 4. Run the chatbot server
 
 ```bash
-python smol.py
+docker compose up -d 
 ```
 
-Open your browser and go to `http://localhost:5000`.
+Open your browser and go to `http://localhost:5001`.
 
 ---
 
 ## Project structure
 
 ```
-├── smol.py              # Main Flask application
-├── requirements.txt     # Python dependencies
-├── templates/
-│   └── index.html       # Web interface
-├── static/
-│   └── style.css        # Custom styles
+├── smol.py                  # Main Flask application
+├── requirements.txt         # Python dependencies
+├── docker-compose.yml       # Docker Compose setup (MongoDB, secrets, network)
+├── Dockerfile               # (If present) Docker build for the app
+├── app/
+│   ├── static/
+│   │   ├── style.css        # Custom styles
+│   │   └── app.js           # Frontend logic
+│   ├── templates/
+│   │   └── index.html       # Web interface
+│   ├── mongo_setup/
+│   │   ├── setup.py         # MongoDB connection and helpers
+│   │   └── __init__.py
+│   └── smol.py              # (entrypoint, if not at root)
+├── mongo-init-scripts/
+│   └── init-mongo.sh        # MongoDB initialization script
 └── README.md
 ```
 
@@ -72,18 +81,27 @@ Open your browser and go to `http://localhost:5000`.
 
 ## Features
 
-- Chat with message history  
-- Responses rendered in Markdown, including code blocks  
-- Simple and responsive web interface  
+- Chat with message history and persistent conversations (MongoDB)
+- Responsive web interface (Bootstrap 5, Offcanvas sidebar)
+- Sidebar with conversation list and new conversation button always at the top
+- Automatic chat title generation using LLM
+- Markdown rendering in responses, including code blocks
+- User and assistant message bubbles
+- Button to start a new conversation at any time
+- Send button is disabled while waiting for a response
+- Only the sidebar and chat history have scrollbars (no global scroll)
+- All UI in English
+- Docker Compose support with secrets for MongoDB
 
 ---
 
 ## Possible improvements
 
-- Support for multiple Ollama models  
-- Streaming responses  
-- Persistence of chat history  
-- User session management  
+- Support for multiple Ollama models
+- Streaming responses
+- User authentication and session management
+- More advanced chat search/filter
+- Improved error handling and notifications
 
 ---
 
