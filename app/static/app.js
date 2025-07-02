@@ -44,18 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     async function loadConversations() {
         conversationList.innerHTML = "";
         try {
             const res = await fetch(`/api/conversations?session_id=${SESSION_ID}`);
-
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
-
             const chats = await res.json();
-
             if (!Array.isArray(chats) || chats.length === 0) {
                 const noChatsEl = document.createElement("li");
                 noChatsEl.textContent = "No conversations found.";
@@ -63,12 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 conversationList.appendChild(noChatsEl);
                 return;
             }
-
             chats.forEach(chat => {
                 const li = document.createElement("li");
                 li.className = "mb-2";
-                li.innerHTML = `<button class="btn btn-outline-light w-100 rounded-pill">${chat.title || chat.chat_id}</button>`;
-
+                li.innerHTML = `<button class="btn btn-outline-light w-100 rounded-pill">${chat.chat_title || chat.chat_id}</button>`;
                 const btn = li.querySelector("button");
                 btn.addEventListener("click", () => loadChat(chat.chat_id));
                 conversationList.appendChild(li);
@@ -82,18 +76,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-
     async function loadChat(chatId) {
         if (!chatId) return;
         currentChatId = chatId;
         clearChatUI();
-
         try {
-            const res = await fetch(`/chat/${chatId}`);
+            const res = await fetch(`/chat/${chatId}?session_id=${SESSION_ID}`);
             const data = await res.json();
             if (data.error) throw new Error(data.error);
-
             (data.messages || []).forEach(msg => {
                 const role = msg.speaker === "user" ? "user" : "assistant";
                 messages.push({ role, content: msg.message });
@@ -105,16 +95,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function sendMessage(messageText) {
+        const sendBtn = form.querySelector('button[type="submit"]');
+        if (sendBtn) sendBtn.disabled = true;
         if (!currentChatId) {
             currentChatId = await createNewChat();
-            if (!currentChatId) return;
+            if (!currentChatId) {
+                if (sendBtn) sendBtn.disabled = false;
+                return;
+            }
             await loadConversations();
         }
-
         messages.push({ role: "user", content: messageText });
         appendMessage("user", messageText);
         promptInput.value = "";
-
         const thinkingEl = document.createElement("div");
         thinkingEl.className = "d-flex mb-3 justify-content-start";
         thinkingEl.innerHTML = `
@@ -124,22 +117,20 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
         chatHistory.appendChild(thinkingEl);
         chatHistory.scrollTop = chatHistory.scrollHeight;
-
         try {
+            const lastMessages = messages.slice(-5);
             const res = await fetch(`/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    messages,
+                    messages: lastMessages,
                     chat_id: currentChatId,
                     session_id: SESSION_ID
                 })
             });
-
             const data = await res.json();
             const response = data.response || "*[Empty response]*";
             messages.push({ role: "assistant", content: response });
-
             thinkingEl.innerHTML = `
         <div class="p-3 rounded-4 shadow-sm bg-light text-dark markdown-body" style="max-width: 80%;">
           ${marked.parse(response)}
@@ -149,9 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Chat error:", err);
             thinkingEl.innerHTML = `
         <div class="p-3 rounded-4 shadow-sm bg-danger text-white" style="max-width: 80%;">
-          ⚠️ Error: ${err.message}
+          Error: ${err.message}
         </div>
       `;
+        } finally {
+            if (sendBtn) sendBtn.disabled = false;
         }
     }
 
