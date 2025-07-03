@@ -48,6 +48,14 @@ pip install -r requirements.txt
 
 ### 4. Run the chatbot server
 
+#### Before running the chatbot server, create the secrets:
+```bash
+mkdir .secrets
+echo "DB ROOT PASSWORD" >> .secrets/mongo_pass
+echo "APP-User RW PASSWORD" >> .secrets/mongo_app_pass
+```
+
+Run the chatbot server
 ```bash
 docker compose up -d 
 ```
