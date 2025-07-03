@@ -59,10 +59,9 @@ Open your browser and go to `http://localhost:5001`.
 ## Project structure
 
 ```
-├── smol.py                  # Main Flask application
 ├── requirements.txt         # Python dependencies
 ├── docker-compose.yml       # Docker Compose setup (MongoDB, secrets, network)
-├── Dockerfile               # (If present) Docker build for the app
+├── Dockerfile               # Docker build for the app
 ├── app/
 │   ├── static/
 │   │   ├── style.css        # Custom styles
@@ -72,7 +71,7 @@ Open your browser and go to `http://localhost:5001`.
 │   ├── mongo_setup/
 │   │   ├── setup.py         # MongoDB connection and helpers
 │   │   └── __init__.py
-│   └── smol.py              # (entrypoint, if not at root)
+│   └── smol.py              # Main Application
 ├── mongo-init-scripts/
 │   └── init-mongo.sh        # MongoDB initialization script
 └── README.md
