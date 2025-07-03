@@ -9,14 +9,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentChatId = null;
     const SESSION_ID = "4A73CB69-FA33-4022-B9C2-B1E9C859C9CC";
 
+    // Adiciona DOMPurify via CDN
+    const domPurifyScript = document.createElement('script');
+    domPurifyScript.src = 'https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js';
+    domPurifyScript.defer = true;
+    document.head.appendChild(domPurifyScript);
+
     function appendMessage(role, content) {
         const wrapper = document.createElement("div");
         wrapper.className = `d-flex mb-3 ${role === "user" ? "justify-content-end" : "justify-content-start"}`;
-        wrapper.innerHTML = `
-      <div class="p-3 rounded-4 shadow-sm ${role === "user" ? "bg-primary text-white" : "bg-light text-dark markdown-body"}" style="max-width: 80%;">
-        ${role === "user" ? content : marked.parse(content)}
+        if (role === "user") {
+            wrapper.innerHTML = `
+      <div class="p-3 rounded-4 shadow-sm bg-primary text-white" style="max-width: 80%;">
+        ${escapeHTML(content)}
       </div>
     `;
+        } else {
+            const rawMarkdown = marked.parse(content, { breaks: true, gfm: true });
+            const safeMarkdown = window.DOMPurify ? window.DOMPurify.sanitize(rawMarkdown) : rawMarkdown;
+            wrapper.innerHTML = `
+      <div class="p-3 rounded-4 shadow-sm bg-light text-dark markdown-body" style="max-width: 80%;">
+        ${safeMarkdown}
+      </div>
+    `;
+        }
         chatHistory.appendChild(wrapper);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
@@ -62,7 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
             chats.forEach(chat => {
                 const li = document.createElement("li");
                 li.className = "mb-2";
-                li.innerHTML = `<button class="btn btn-outline-light w-100 rounded-pill">${chat.chat_title || chat.chat_id}</button>`;
+                const safeTitle = escapeHTML(chat.chat_title || chat.chat_id);
+                li.innerHTML = `<button class="btn btn-outline-light w-100 rounded-pill">${safeTitle}</button>`;
                 const btn = li.querySelector("button");
                 btn.addEventListener("click", () => loadChat(chat.chat_id));
                 conversationList.appendChild(li);
@@ -112,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         thinkingEl.className = "d-flex mb-3 justify-content-start";
         thinkingEl.innerHTML = `
       <div class="p-3 rounded-4 shadow-sm bg-light text-dark markdown-body" style="max-width: 80%;">
-        _Thinking..._
+        _Thinking_
       </div>
     `;
         chatHistory.appendChild(thinkingEl);
@@ -140,12 +157,25 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Chat error:", err);
             thinkingEl.innerHTML = `
         <div class="p-3 rounded-4 shadow-sm bg-danger text-white" style="max-width: 80%;">
-          Error: ${err.message}
+          Error: ${escapeHTML(err.message)}
         </div>
       `;
         } finally {
             if (sendBtn) sendBtn.disabled = false;
         }
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, function(tag) {
+            const chars = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            };
+            return chars[tag] || tag;
+        });
     }
 
     newConvoBtn.addEventListener("click", async () => {
